@@ -16,3 +16,4 @@ group :development do
 end
 
 gem "builder"
+gem "prawn"

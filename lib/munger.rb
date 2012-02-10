@@ -7,6 +7,7 @@ require 'munger/item'
 
 require 'munger/render'
 require 'munger/render/csv'
+require 'munger/render/pdf'
 require 'munger/render/html'
 require 'munger/render/sortable_html'
 require 'munger/render/text'

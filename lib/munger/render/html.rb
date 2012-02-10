@@ -67,9 +67,9 @@ module Munger #:nodoc:
                 end
               end
             end
-          end
+          end # of row loop
           
-        end
+        end # of table
       end
       
       def cycle(one, two)
