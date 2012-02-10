@@ -1,56 +1,54 @@
+# encoding: utf-8
+
 require 'rubygems'
-Gem::manage_gems
-require 'rake/gempackagetask'
+require 'bundler'
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+require 'rake'
+
+require 'jeweler'
+Jeweler::Tasks.new do |gem|
+  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
+    
+  gem.name = "munger"
+  gem.homepage = "http://github.com/jwigal/munger"
+  gem.license = "MIT"
+  gem.summary = %Q{Reporting engine in Ruby}
+  gem.description = %Q{Reporting engine in Ruby. Forked from Scott Chacon et al.}
+  gem.email = "jeff@assignr.com"
+  gem.authors   =  ['Scott Chacon', 'Brandon Mitchell', 'Don Morrison', 'Eric Lindvall', 'Jeff Wigal']
+  # dependencies defined in Gemfile
+end
+Jeweler::RubygemsDotOrgTasks.new
+
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+end
+
+require 'rcov/rcovtask'
+Rcov::RcovTask.new do |test|
+  test.libs << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+  test.rcov_opts << '--exclude "gems/*"'
+end
+
+task :default => :test
+
 require 'rake/rdoctask'
-require 'spec/rake/spectask'
+Rake::RDocTask.new do |rdoc|
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
-spec = Gem::Specification.new do |s|
-    s.platform  =   Gem::Platform::RUBY
-    s.name      =   "munger"
-    s.version   =   "0.1.3"
-    s.author    =   "Scott Chacon"
-    s.email     =   "schacon@gmail.com"
-    s.summary   =   "A reporting engine in Ruby"
-    s.files     =   FileList['lib/**/*', 'spec/**/*'].to_a
-
-    s.homepage = "http://github/schacon/munger"
-
-    s.require_path  =   "lib"
-    s.test_files = Dir.glob('spec/*.rb')
-    s.has_rdoc  =   true
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.need_tar = true
-end
-
-task :default => "pkg/#{spec.name}-#{spec.version}.gem" do
-    puts "generated latest version"
-end
-
-desc 'Run specs'
-Spec::Rake::SpecTask.new do |t|
-  t.spec_opts = ['--format', 'specdoc', '--colour', '--diff']
-end
-
-desc 'Generate coverage reports'
-Spec::Rake::SpecTask.new('spec:coverage') do |t|
-  t.rcov = true
-end
-
-desc 'Generate a nice HTML report of spec results'
-Spec::Rake::SpecTask.new('spec:report') do |t|
-  t.spec_opts = ['--format', 'html:report.html', '--diff']
-end
-
-task :doc => [:rdoc]
-namespace :doc do
-  Rake::RDocTask.new do |rdoc|
-    files = ["README", "lib/**/*.rb"]
-    rdoc.rdoc_files.add(files)
-    rdoc.main = "README"
-    rdoc.title = "Munger Docs"
-    rdoc.rdoc_dir = "doc"
-    rdoc.options << "--line-numbers" << "--inline-source"
-  end
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = "munger2 #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
 end
