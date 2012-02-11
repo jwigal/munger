@@ -9,8 +9,8 @@ module Munger #:nodoc:
   module Render #:nodoc:
     class Pdf
     
-      attr_reader :report, :classes, :group_style, :group_font, :table_format, :document_options
-      attr_reader :pdf
+      attr_reader :report, :classes, :group_style, :group_font, :table_format, :document_options,
+                  :pdf, :group_font_face
       def pdf
         @pdf ||= Prawn::Document.new(@document_options)
       end
@@ -24,31 +24,7 @@ module Munger #:nodoc:
         self
       end
 
-      def set_document_options(options=nil)
-        options = {} if !options
-        default = {:page_layout => :landscape, :margin => [50,50]}
-        @document_options = default.merge(options)        
-      end
 
-      
-      def set_table_format(options=nil)
-        options = {} if !options
-        default = {:header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0} }
-        @table_format = default.merge(options)        
-      end
-      
-      def set_group_style(options = nil)
-        options = {} if !options
-        default = {:style => :bold}
-        @group_style = default.merge(options)        
-      end
-
-      def set_group_font(options = nil)
-        options = {} if !options
-        default = {:size => 16}
-        @group_font = default.merge(options)        
-      end
-      
       def render
         if @report.process_data.any?{|row| row[:meta][:group_header]}
           header = @report.columns.collect{|column| @report.column_title(column)}
@@ -57,7 +33,7 @@ module Munger #:nodoc:
             if row[:meta][:group_header]              
               draw_table( table_data ) if table_data.size > 1
               conditional_page_break
-              pdf.font("Helvetica", @group_font) { 
+              pdf.font(@group_font_face, @group_font) { 
                 pdf.text row[:meta][:group_value].to_s, @group_style 
               }
               table_data = [header]
@@ -92,6 +68,31 @@ module Munger #:nodoc:
       end
       
       protected
+
+      def set_document_options(options=nil)
+        options = {} if !options
+        default = {:page_layout => :landscape, :margin => [50,50]}
+        @document_options = default.merge(options)        
+      end
+      
+      def set_table_format(options=nil)
+        options = {} if !options
+        default = {:header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0} }
+        @table_format = default.merge(options)        
+      end
+      
+      def set_group_style(options = nil)
+        options = {} if !options
+        default = {:style => :bold}
+        @group_style = default.merge(options)        
+      end
+
+      def set_group_font(options = nil)
+        options = {} if !options
+        default = {:size => 16, :font => "Helvetica"}
+        @group_font = default.merge(options)        
+        @group_font_face = @group_font.delete(:font)
+      end
       
       def draw_table(data)
         pdf.table(data, @table_format) do
@@ -116,7 +117,7 @@ module Munger #:nodoc:
       def pdf_footer
         pdf.stroke { pdf.line [ pdf.bounds.left, pdf.bounds.bottom + 20], [pdf.bounds.right, pdf.bounds.bottom + 20]}
         pdf.bounding_box [ pdf.bounds.left, pdf.bounds.bottom + 15], :width => pdf.bounds.width do
-          pdf.text "This is the report footer. #{pdf.bounds.bottom_right}"
+          pdf.text "This is the report footer."
         end        
       end
       
