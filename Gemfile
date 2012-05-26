@@ -7,9 +7,10 @@ source "http://rubygems.org"
 # Include everything needed to run rake, tests, features, etc.
 group :development do
   gem "shoulda", ">= 0"
-  gem "bundler", "~> 1.0.0"
+  gem "bundler"
   gem "jeweler", "~> 1.6.4"
   gem "rcov", ">= 0"
+  gem "rdoc"
   gem "rspec"
   gem "rspec-hpricot-matchers", :git => "https://github.com/fnando/rspec-hpricot-matchers.git"
   gem "hpricot"
