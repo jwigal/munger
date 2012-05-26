@@ -18,5 +18,9 @@ module Munger #:nodoc:
     def self.to_csv(report)
       CSV::new(report).render
     end
+
+    def self.to_pdf(report, options ={})
+      Pdf::new(report,options).render
+    end
   end
 end
