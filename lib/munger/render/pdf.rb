@@ -10,17 +10,45 @@ module Munger #:nodoc:
     class Pdf
     
       attr_reader :report, :classes, :group_style, :group_font, :table_format, :document_options,
-                  :pdf, :group_font_face
+                  :pdf, :group_font_face, :header_font, :header_font_face, :footer_font, :footer_font_face
       def pdf
         @pdf ||= Prawn::Document.new(@document_options)
       end
+      
+=begin
+
+Public: Create a new Munger::Render::Pdf object
+
+report  - The Munger::Report to be rendered.
+options - A Hash with options for rendering the PDF.
+
+    options = {
+      :group_style => {:style => :bold},
+      :group_font => {:size => 16, :font => "Helvetica"},
+      :table_format => {:header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0} },
+      :document => {:page_layout => :landscape, :margin => [50,50]},
+      :header => {:size => 12, :font => "Helvetica", :text => ""},
+      :footer => {:size => 12, :font => "Helvetica", :text => ""}
+    }
+
+Examples
+
+  Munger::Render::Pdf.new()
+  # => 'TomTomTomTom'
+
+Returns a Munger::Render::Pdf
+
+
+=end      
       
       def initialize(report, options = {})
         @report = report
         set_group_style(options[:group_style])
         set_group_font(options[:group_font])
         set_table_format(options[:table_format])
-        set_document_options(options[:document])        
+        set_document_options(options[:document])
+        set_header_options(options[:header])        
+        set_footer_options(options[:footer])        
         self
       end
 
@@ -69,6 +97,22 @@ module Munger #:nodoc:
       
       protected
 
+      def set_header_options(options = nil)
+        options = {} if !options
+        default = {:size => 12, :font => "Helvetica", :text => ""}
+        @header_font = default.merge(options)        
+        @header_font_face = @header_font.delete(:font)
+        @header_text = @header_font.delete(:text)
+      end
+
+      def set_footer_options(options = nil)
+        options = {} if !options
+        default = {:size => 12, :font => "Helvetica", :text => ""}
+        @footer_font = default.merge(options)        
+        @footer_font_face = @footer_font.delete(:font)
+        @footer_text = @footer_font.delete(:text) || ""
+      end
+
       def set_document_options(options=nil)
         options = {} if !options
         default = {:page_layout => :landscape, :margin => [50,50]}
@@ -77,8 +121,13 @@ module Munger #:nodoc:
       
       def set_table_format(options=nil)
         options = {} if !options
-        default = {:header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0} }
-        @table_format = default.merge(options)        
+        default = {
+          :header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0},
+          :font_size => 10, :font_face => "Helvetica"
+        }
+        @table_format = default.merge(options)
+        @table_font_size = @table_format.delete(:font_size)        
+        @table_font_face = @table_format.delete(:font_face)        
       end
       
       def set_group_style(options = nil)
@@ -95,11 +144,13 @@ module Munger #:nodoc:
       end
       
       def draw_table(data)
-        pdf.table(data, @table_format) do
-          row(0).borders = [:bottom]
-          row(0).border_width = 2
-          row(0).font_style = :bold
-        end    
+        pdf.font(@table_font_face, :size => @table_font_size) do
+          pdf.table(data, @table_format) do
+            row(0).borders = [:bottom]
+            row(0).border_width = 2
+            row(0).font_style = :bold
+          end    
+        end
         pdf.move_down 20    
       end
       
@@ -110,14 +161,14 @@ module Munger #:nodoc:
       def pdf_header
         pdf.stroke { pdf.line [ pdf.bounds.left, pdf.bounds.top + 8], [pdf.bounds.right, pdf.bounds.top + 8]}
         pdf.bounding_box [ pdf.bounds.left, pdf.bounds.top + 20], :width => pdf.bounds.width do
-          pdf.text "This is the report header."
+          pdf.font(@header_font_face, @header_font) { pdf.text @header_text }
         end        
       end
       
       def pdf_footer
         pdf.stroke { pdf.line [ pdf.bounds.left, pdf.bounds.bottom + 20], [pdf.bounds.right, pdf.bounds.bottom + 20]}
         pdf.bounding_box [ pdf.bounds.left, pdf.bounds.bottom + 15], :width => pdf.bounds.width do
-          pdf.text "This is the report footer."
+          pdf.font(@footer_font_face, @footer_font) { pdf.text @footer_text }
         end        
       end
       

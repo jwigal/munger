@@ -12,9 +12,9 @@ group :development do
   gem "rcov", ">= 0"
   gem "rdoc"
   gem "rspec"
-  gem "rspec-hpricot-matchers", :git => "https://github.com/fnando/rspec-hpricot-matchers.git"
-  gem "hpricot"
+  gem "rspec_tag_matchers"
 end
 
 gem "builder"
 gem "prawn"
+gem 'fastercsv', :platforms => :ruby_18

@@ -6,9 +6,10 @@ require 'fileutils'
 require 'logger'
 require 'pp'
 
-require "rspec-hpricot-matchers"
+require 'rspec_tag_matchers'
+  
 RSpec.configure do |config|
-  config.include(HpricotSpec::Matchers)
+  config.include(RspecTagMatchers)
 end
 
 module MungerSpecHelper
