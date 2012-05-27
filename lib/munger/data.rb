@@ -39,9 +39,7 @@ module Munger #:nodoc:
     end
     
     def columns
-      @columns ||= clean_data(@data.first).to_hash.keys
-    rescue
-      puts clean_data(@data.first).to_hash.inspect
+      @columns ||= @data.collect{|item| clean_data(item).to_hash.keys}.flatten.uniq
     end
     
     # :default:	The default value to use for the column in existing rows. 
