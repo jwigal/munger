@@ -5,10 +5,10 @@ module Munger #:nodoc:
       attr_reader :report
       
       def csv_class
-        if defined?(::CSV)
-          ::CSV
-        elsif defined?(::FasterCSV)
+        if defined?(::FasterCSV)
           ::FasterCSV
+        elsif defined?(::CSV)
+          ::CSV
         else
           raise NoMethodError, "Could not find a csv parser"
         end
@@ -24,7 +24,9 @@ module Munger #:nodoc:
           output << @report.columns.collect { |col| @report.column_title(col).to_s }        
           # body
           @report.process_data.each do |row|
-            output << @report.columns.collect { |col| row[:data][col].to_s }
+            if row[:meta][:data]
+              output << @report.columns.collect { |col| row[:data][col].to_s }
+            end
           end
         end        
       end

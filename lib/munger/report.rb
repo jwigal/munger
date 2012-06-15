@@ -2,8 +2,8 @@ module Munger #:nodoc:
   
   class Report
     
-    attr_writer :data, :sort, :columns, :subgroup, :subgroup_options, :aggregate
-    attr_accessor :column_titles, :column_data_fields, :column_formatters
+    attr_writer :data, :sort, :columns, :subgroup, :aggregate
+    attr_accessor :column_titles, :column_data_fields, :column_formatters, :subgroup_options
     attr_reader :process_data, :grouping_level
     
     # r = Munger::Report.new ( :data => data, 
@@ -186,7 +186,7 @@ module Munger #:nodoc:
       def do_add_aggregate_rows
         return false if !@aggregate
         return false if !@aggregate.is_a? Hash
-        
+        return false if @process_data.size == 0
         totals = {}        
         
         @process_data.each_with_index do |row, index|
@@ -207,18 +207,25 @@ module Munger #:nodoc:
               Data.array(columns).each do |column|
                 data = totals[column][level]
                 @process_data[index][:data][column] = calculate_aggregate(type, data)
+                if type.is_a?(Symbol)
+                  @process_data[index][:aggregate] ||= {}
+                  @process_data[index][:aggregate][column] ||= {}
+                  @process_data[index][:aggregate][column][type] = @process_data[index][:data][column]
+                end
                 totals[column][level] = []
               end
             end
           end
         end
               
-        total_row = {:data => {}, :meta => {:group => 0}}
+        total_row = {:data => {}, :meta => {:group => 0}, :aggregate => {}}
         # write one row at the end with the totals
         @aggregate.each do |type, columns|
           Data.array(columns).each do |column|
             data = totals[column][0]
             total_row[:data][column] = calculate_aggregate(type, data)
+            total_row[:aggregate][column] ||= {}
+            total_row[:aggregate][column][type] = total_row[:data][column]
           end
         end
         @process_data << total_row
@@ -244,6 +251,7 @@ module Munger #:nodoc:
       
       def do_add_groupings
         return false if !@subgroup
+        return false if @process_data.size == 0
         sub = Data.array(@subgroup)
         @grouping_level = sub.size
         
