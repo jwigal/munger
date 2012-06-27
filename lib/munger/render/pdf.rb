@@ -82,7 +82,11 @@ Returns a Munger::Render::Pdf
         pdf.move_down 20    
         row[:aggregate].each do |field,hash|
           hash.each do |aggregate,v|
-            pdf.text "Total #{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)}: #{v}"
+            if aggregate.is_a?(Proc)
+              pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
+            else
+              pdf.text "Total #{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)}: #{v}"
+            end
           end
         end               
       end
@@ -90,7 +94,11 @@ Returns a Munger::Render::Pdf
       def render_subtotals(row, group_name)
         row[:aggregate].each do |field,hash|
           hash.each do |aggregate,v|
-            pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+            if aggregate.is_a?(Proc)
+              pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
+            else
+              pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+            end
           end
         end               
         pdf.move_down 10    

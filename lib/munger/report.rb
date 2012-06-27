@@ -207,11 +207,9 @@ module Munger #:nodoc:
               Data.array(columns).each do |column|
                 data = totals[column][level]
                 @process_data[index][:data][column] = calculate_aggregate(type, data)
-                if type.is_a?(Symbol)
-                  @process_data[index][:aggregate] ||= {}
-                  @process_data[index][:aggregate][column] ||= {}
-                  @process_data[index][:aggregate][column][type] = @process_data[index][:data][column]
-                end
+                @process_data[index][:aggregate] ||= {}
+                @process_data[index][:aggregate][column] ||= {}
+                @process_data[index][:aggregate][column][type] = @process_data[index][:data][column]
                 totals[column][level] = []
               end
             end
