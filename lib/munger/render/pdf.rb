@@ -92,15 +92,17 @@ Returns a Munger::Render::Pdf
       end
       
       def render_subtotals(row, group_name)
-        row[:aggregate].each do |field,hash|
-          hash.each do |aggregate,v|
-            if aggregate.is_a?(Proc)
-              pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
-            else
-              pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+        if row[:aggregate].respond_to?(:each)
+          row[:aggregate].each do |field,hash|
+            hash.each do |aggregate,v|
+              if aggregate.is_a?(Proc)
+                pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
+              else
+                pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+              end
             end
-          end
-        end               
+          end   
+        end            
         pdf.move_down 10    
       end
       
