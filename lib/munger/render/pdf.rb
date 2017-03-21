@@ -181,7 +181,7 @@ Returns a Munger::Render::Pdf
 
       def set_header_options(options = nil)
         options = {} if !options
-        default = {:size => 12, :font => "RobotoSlab"}
+        default = {:size => 12, :font => "Roboto"}
         @header_font = default.merge(options)
         @header_font_face = @header_font.delete(:font)
         @header_text = @header_font.delete(:text)
@@ -189,7 +189,7 @@ Returns a Munger::Render::Pdf
 
       def set_footer_options(options = nil)
         options = {} if !options
-        default = {:size => 12, :font => "RobotoSlab"}
+        default = {:size => 12, :font => "Roboto"}
         @footer_font = default.merge(options)
         @footer_font_face = @footer_font.delete(:font)
         @footer_text = @footer_font.delete(:text)
@@ -205,7 +205,7 @@ Returns a Munger::Render::Pdf
         options = {} if !options
         default = {
           :header => true, :row_colors => %w(ffffff ede5b2), :cell_style => {:border_width => 0},
-          :font_size => 10, :font_face => "RobotoSlab", :header_style => {}
+          :font_size => 10, :font_face => "Roboto", :header_style => {}
         }
         options = default.merge(options)
         @table_header_style = options.delete(:header_style)
@@ -222,7 +222,7 @@ Returns a Munger::Render::Pdf
 
       def set_group_font(options = nil)
         options = {} if !options
-        default = {:size => 16, :font => "RobotoSlab"}
+        default = {:size => 16, :font => "Roboto"}
         @group_font = default.merge(options)
         @group_font_face = @group_font.delete(:font)
       end
