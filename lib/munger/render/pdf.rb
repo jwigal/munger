@@ -100,31 +100,35 @@ Returns a Munger::Render::Pdf
       end
 
       def render_grand_total(row)
-        pdf.move_down 20
-        row[:aggregate].each do |field,hash|
-          hash.each do |aggregate,v|
-            if aggregate.is_a?(Proc)
-              pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
-            else
-              pdf.text "Total #{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)}: #{v}"
+        pdf.font(@group_font_face, @group_font) do
+          pdf.move_down 20
+          row[:aggregate].each do |field,hash|
+            hash.each do |aggregate,v|
+              if aggregate.is_a?(Proc)
+                pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
+              else
+                pdf.text "Total #{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)}: #{v}"
+              end
             end
           end
         end
       end
 
       def render_subtotals(row, group_name)
-        if row[:aggregate].respond_to?(:each)
-          row[:aggregate].each do |field,hash|
-            hash.each do |aggregate,v|
-              if aggregate.is_a?(Proc)
-                pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
-              else
-                pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+        pdf.font(@group_font_face, @group_font) do
+          if row[:aggregate].respond_to?(:each)
+            row[:aggregate].each do |field,hash|
+              hash.each do |aggregate,v|
+                if aggregate.is_a?(Proc)
+                  pdf.text "#{@report.column_title(field.to_sym)}: #{v}"
+                else
+                  pdf.text "#{aggregate.to_s.capitalize} of #{@report.column_title(field.to_sym)} for #{group_name}: #{v}"
+                end
               end
             end
           end
+          pdf.move_down 10
         end
-        pdf.move_down 10
       end
 
       def page_break_after_each_group?
